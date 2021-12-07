@@ -4,11 +4,19 @@ version := "0.1"
 
 scalaVersion := "2.12.15"
 
-libraryDependencies += "org.apache.spark" %% "spark-core" % "3.2.0"
-libraryDependencies += "org.apache.spark" %% "spark-sql" % "3.2.0"
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.10" % Test
-libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.9.4"
-libraryDependencies += "org.apache.spark" %% "spark-hive" % "3.2.0"
+val Versions = new {
+  val spark = "3.2.0"
+  val scalaLogging = "3.9.4"
+  val config = "1.4.1"
+}
+
+libraryDependencies += "org.apache.spark" %% "spark-core" % Versions.spark % Provided
+libraryDependencies += "org.apache.spark" %% "spark-sql" % Versions.spark % Provided
+libraryDependencies += "org.scalatest" %% "scalatest" % Versions.spark % Test
+libraryDependencies += "org.apache.spark" %% "spark-hive" % Versions.spark % Provided
+libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % Versions.scalaLogging
+libraryDependencies += "com.typesafe" % "config" % Versions.config
+
 
 assemblyMergeStrategy in assembly := {
   case PathList("META-INF", xs @ _*) => MergeStrategy.discard

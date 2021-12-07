@@ -9,7 +9,9 @@ trait JobHelper extends SparkInitializer {
 
   def main(args: Array[String]): Unit = {
     val sparkSubmitArgs = argumentParser(args.mkString)
-    val spark = initializeSpark(sparkSubmitArgs)
+    val config = getConfig(sparkSubmitArgs.getOrElse("configFileLocation", "spark.conf"))
+    val sparkConf = getSparkConf(config)
+    val spark = initializeSpark(sparkConf)
 
     setSparkLoggingLevel(spark, sparkSubmitArgs.getOrElse("logLevel", "WARN"))
 
