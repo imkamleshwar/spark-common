@@ -1,6 +1,7 @@
 package common
 
 import org.apache.spark.sql.SparkSession
+import utils.ConfigUtils.addSparkArgsToConfig
 import utils.SparkInitializationUtils.argumentParser
 
 import java.util.Date
@@ -9,7 +10,8 @@ trait JobHelper extends SparkInitializer {
 
   def main(args: Array[String]): Unit = {
     val sparkSubmitArgs = argumentParser(args.mkString)
-    val config = getConfig(sparkSubmitArgs.getOrElse("configFileLocation", "spark.conf"))
+    val initialConf = getConfig(sparkSubmitArgs.getOrElse("configFileLocation", "spark.conf"))
+    val config = addSparkArgsToConfig(initialConf, sparkSubmitArgs)
     val sparkConf = getSparkConf(config)
     val spark = initializeSpark(sparkConf)
 
