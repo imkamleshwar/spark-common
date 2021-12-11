@@ -1,12 +1,13 @@
 package utils
 
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{ConfigException, ConfigFactory, ConfigValueFactory}
+import constants.ConfigConstants.MANDATORY_CONFIGS
 import testSpec.TestSpecWithFunSuite
-import utils.ConfigUtils.addSparkArgsToConfig
+import utils.ConfigUtils.{addSparkArgsToConfig, checkMandatoryConfig}
 
 class ConfigUtilsTest extends TestSpecWithFunSuite {
 
-  test("ConfigUtilsTest 1: Config should get updated when appropriate config value is passed") {
+  test("ConfigUtilsTest.addSparkArgsToConfig 1: Config should get updated when appropriate config value is passed") {
 
     val config = ConfigFactory.load("spark.conf")
 
@@ -28,7 +29,49 @@ class ConfigUtilsTest extends TestSpecWithFunSuite {
         && newConfig.getString("spark.logLevel") == "ERROR"
         && newConfig.getString("outputPath") == "output/path"
     )
+  }
 
+  test("ConfigUtilsTest.checkMandatoryConfig 1: `Either` Left should have true") {
+
+    val config = ConfigFactory.load("spark.conf")
+      .withValue("spark.logLevel", ConfigValueFactory.fromAnyRef("INFO"))
+      .withValue("jobConfigs", ConfigValueFactory.fromAnyRef("jobsConf.testSDC2Job.conf"))
+
+    val eitherBoolOrException = checkMandatoryConfig(MANDATORY_CONFIGS, config)
+
+    assert(
+      eitherBoolOrException.isLeft
+        && !eitherBoolOrException.isRight
+    )
+  }
+
+  test("ConfigUtilsTest.checkMandatoryConfig 2: `Either` Right should be have ConfigException") {
+
+    val config = ConfigFactory.load("spark.conf")
+      .withValue("spark.logLevel", ConfigValueFactory.fromAnyRef("INFO"))
+
+    val eitherBoolOrException = checkMandatoryConfig(MANDATORY_CONFIGS, config)
+
+    assert(
+      !eitherBoolOrException.isLeft
+        && eitherBoolOrException.isRight
+    )
+
+    an[ConfigException] should be thrownBy (throw eitherBoolOrException.right.get)
+  }
+
+  test("ConfigUtilsTest.checkMandatoryConfig 3: `Either` Right should be true if MANDATORY_CONFIGS is not same") {
+
+    val config = ConfigFactory.load("spark.conf")
+      .withValue("spark.logLevel", ConfigValueFactory.fromAnyRef("INFO"))
+      .withValue("jobConfigs", ConfigValueFactory.fromAnyRef("jobsConf.testSDC2Job.conf"))
+
+    val eitherBoolOrException = checkMandatoryConfig(MANDATORY_CONFIGS + "aDummyConfig", config)
+
+    assert(
+      !eitherBoolOrException.isLeft
+        && eitherBoolOrException.isRight
+    )
   }
 
 }

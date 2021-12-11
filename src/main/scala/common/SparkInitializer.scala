@@ -9,12 +9,15 @@ trait SparkInitializer extends LazyLogging {
 
   def initializeSpark(sparkConf: SparkConf): SparkSession = {
 
-    SparkSession
+    val spark = SparkSession
       .builder()
       .config(sparkConf)
       .enableHiveSupport()
       .getOrCreate()
 
+    setSparkLoggingLevel(spark)
+
+    spark
   }
 
   def setSparkLoggingLevel(spark: SparkSession, logLevel: String = "WARN"): Unit = {
@@ -28,6 +31,6 @@ trait SparkInitializer extends LazyLogging {
       .setAppName(config.getString("spark.appName"))
   }
 
-  def getConfig(configFileLocation: String): Config = ConfigFactory.load(configFileLocation)
+  def getConfig(jobConfigs: String): Config = ConfigFactory.load(jobConfigs)
 
 }
