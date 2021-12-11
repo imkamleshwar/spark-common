@@ -22,8 +22,7 @@ trait JobHelper extends SparkInitializer with LazyLogging {
       case Right(configMissingException) =>
         throw configMissingException
     }
-    //val initialConf = getConfig(sparkSubmitArgs.getOrElse("configFileLocation", "jobsConf/SDC2Job.conf"))
-
+    
     val sparkConf = getSparkConf(config)
     val spark = initializeSpark(sparkConf)
 
